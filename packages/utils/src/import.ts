@@ -501,6 +501,21 @@ export async function importModule(filepath: string, options?: ImportModuleOptio
     return obj;
   }
 
+  // Async module importer override (e.g. a Vitest runner that loads the module
+  // through its own module graph). Same `ModuleImporter` global the tegg loader
+  // uses, so app/boot files and tegg modules resolve via one realm under test.
+  const _moduleImporter = globalThis.__EGG_MODULE_IMPORTER__;
+  if (_moduleImporter) {
+    let obj = await _moduleImporter(moduleFilePath);
+    if (obj && typeof obj === 'object' && (obj as any).default?.__esModule === true && (obj as any).default && 'default' in (obj as any).default) {
+      obj = (obj as any).default;
+    }
+    if (options?.importDefaultOnly && obj && typeof obj === 'object' && 'default' in obj) {
+      obj = (obj as any).default;
+    }
+    return obj;
+  }
+
   let obj: any;
   if (isESM) {
     // esm
