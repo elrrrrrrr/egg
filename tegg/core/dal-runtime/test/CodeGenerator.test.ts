@@ -20,7 +20,7 @@ describe('test/CodeGenerator.test.ts', () => {
     assert.deepEqual(config.copy, [
       {
         from: 'src/templates',
-        to: 'dist/templates',
+        to: 'dist',
       },
     ]);
   });
